@@ -1,32 +1,20 @@
-import json
 import os
 from googleapiclient.discovery import build
-
-
-def printj(dict_to_print: dict) -> None:
-    """Выводит словарь в json-подобном удобном формате с отступами"""
-    print(json.dumps(dict_to_print, indent=2, ensure_ascii=False))
-
-
+from dotenv import load_dotenv
+load_dotenv('.env')
 class Channel:
     """Класс для ютуб-канала"""
-    api_key = 'AIzaSyD18XmtcKqilmDbM-tOqvnGAUhH8SEiFXs'
-
+    # api_key = 'AIzaSyD18XmtcKqilmDbM-tOqvnGAUhH8SEiFXs'
+    api_key: str = os.getenv('SECRET_KEY')
+    print(api_key)
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        pass
-
-    def print_info(self, channel_id)  -> None:
-        """Выводит в консоль информацию о канале."""
-
         self.channel_id = channel_id
-        api_key = 'AIzaSyD18XmtcKqilmDbM-tOqvnGAUhH8SEiFXs'
-        youtube = build('youtube', 'v3', developerKey=api_key)
-        channel_id = 'UCwHL6WHUarjGfUM_586me8w'
-        self.channel = youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
+        self.youtube = build('youtube', 'v3', developerKey=self.api_key)
 
-    def print_info(self):
+    def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        # pass
+        channel = self.youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
+        print(channel)
 
-        printj(self.channel)
+
