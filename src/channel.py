@@ -4,6 +4,7 @@ from googleapiclient.discovery import build
 from dotenv import load_dotenv
 
 load_dotenv('.env')
+
 class Channel:
     """Класс для ютуб-канала"""
     api_key: str = os.getenv('SECRET_KEY')
