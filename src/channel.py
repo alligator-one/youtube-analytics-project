@@ -34,18 +34,18 @@ class Channel:
     def get_service(cls) -> str:
         return cls.youtube
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         __str__
         """
         return f"{self.title} ({self.url})"
 
-    def __add__(self, other):
+    def __add__(self, other: int) -> int:
         if not isinstance(other, Channel):
             raise ValueError("Can only add Channel to another Channel")
         return self.subscriber_count + other.subscriber_count
 
-    def __sub__(self, other):
+    def __sub__(self, other: int) -> int:
         """
         -
         """
@@ -53,7 +53,7 @@ class Channel:
             raise ValueError("Can only subtract Channel to another Channel")
         return self.subscriber_count - other.subscriber_count
 
-    def __lt__(self, other):
+    def __lt__(self, other: int):
         """
         <
         """
@@ -61,7 +61,7 @@ class Channel:
             raise ValueError("Can only less Channel to another Channel")
         return self.subscriber_count < other.subscriber_count
 
-    def __le__(self, other):
+    def __le__(self, other: int) -> bool:
         """
         <=
         """
@@ -69,7 +69,7 @@ class Channel:
             raise ValueError("Can only less than or equal to Channel to another Channel")
         return self.subscriber_count <= other.subscriber_count
 
-    def __gt__(self, other):
+    def __gt__(self, other: int) -> bool:
         """
         >
         """
@@ -77,7 +77,7 @@ class Channel:
             raise ValueError("Can only greater Channel to another Channel")
         return self.subscriber_count > other.subscriber_count
 
-    def __ge__(self, other):
+    def __ge__(self, other: int) -> bool:
         """
         >=
         """
