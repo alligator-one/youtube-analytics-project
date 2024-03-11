@@ -1,37 +1,72 @@
 import os
+import isodate
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
+from src import playlist
 
 load_dotenv('.env')
 api_key: str = os.getenv('SECRET_KEY')
-def get_video(video_id):
-    #api_key: str = os.getenv('SECRET_KEY')
-    youtube = build('youtube', 'v3', developerKey=api_key)
-    video_info = youtube.videos().list(part="snippet,statistics", id=video_id).execute()
-    return video_info
+youtube = build('youtube', 'v3', developerKey=api_key)
 
+class Video(playlist.APIMixin):
 
-def get_playlist(playlist_id):
-    #api_key: str = os.getenv('SECRET_KEY')
-    youtube = build('youtube', 'v3', developerKey=api_key)
-    playlist_info = youtube.playlists().list(part='contentDetails, snippet', id=playlist_id).execute()
-    return playlist_info
+    def __init__(self, id_video):
+        self.__id_video = id_video
+        self.service = self.get_service()
+        self.channel_data = self.get_channel_data()
+        self.title = self.channel_data[0]
+        self.url = f"https://youtu.be/{self.id_video}"
+        self.view_count = self.channel_data[1]
+        self.like_count = self.channel_data[2]
 
-
-class Video:
-    def __init__(self, video_id):
-        self.video_id = video_id
-        self.video_info = get_video(video_id)
-        self.video_title = self.video_info['items'][0]['snippet']['title']
-        self.viewCount = self.video_info['items'][0]['statistics']['viewCount']
-        self.likeCount = self.video_info['items'][0]['statistics']['likeCount']
-        self.video_url = "https://www.youtube.com/watch?=" + self.video_id + '&ab_channel=MoscowPython'
+    @property
+    def id_video(self):
+        return self.__id_video
+    def get_channel_data(self):
+        list_value = []
+        video_id = self.id_video
+        try:
+            request = self.service.videos().list(part='snippet,statistics,contentDetails,topicDetails', id=video_id).execute()
+            title_video: str = request['items'][0]['snippet']['title']
+            list_value.append(title_video)
+            view_count: int = request['items'][0]['statistics']['viewCount']
+            list_value.append(view_count)
+            like_count: int = request['items'][0]['statistics']['likeCount']
+            list_value.append(like_count)
+        except IndexError:
+            list_value.append(None)
+            list_value.append(None)
+            list_value.append(None)
+        return list_value
 
     def __str__(self):
-        return self.video_title
+        return f"{self.title}"
 
 
 class PLVideo(Video):
-    def __init__(self, video_id, playlist_id):
-        super().__init__(video_id)
-        self.playlist_info = get_playlist(playlist_id)
+
+    def __init__(self, id_video, pl_id):
+        super().__init__(id_video)
+        self.__pl_id = pl_id
+
+
+    @property
+    def pl_id(self):
+        return self.__pl_id
+
+    def get_playlist_item_data(self):
+        playlist_info_response = self.service.playlistItems().list(
+            part='snippet',
+            playlistId=self.pl_id,
+            maxResults=1
+        ).execute()
+
+        playlist_info = playlist_info_response.get('items')[0]
+        return playlist_info
+
+    def __str__(self):
+        return f"{self.title}"
+
+broken_video = Video('broken_video_id')
+assert broken_video.title is None
+assert broken_video.like_count is None
